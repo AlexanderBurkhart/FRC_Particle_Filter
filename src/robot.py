@@ -1,16 +1,23 @@
 import math
 import random
+from field import Field
+
 class Robot(object):
 	#TODO: add noise to move and sense
 	#set noise by random.gauss function by using random.gauss(0.0, (insert noise var))
-	def __init__(self, x=0, y=0):
+	def __init__(self, x=0, y=0, randomPos=False):
 		#init robot at a coordinate x, y
 		#print("Initializing")
-		self.world_size = 120
-        	self.x = random.random() * self.world_size
-	    	self.y = random.random() * self.world_size
+		self.field = Field(100)
+		self.deadzones = self.field.getDeadzones()
+		self.world_size = self.field.getSize()
+		self.x = x
+		self.y = y
+		if randomPos:
+        		self.x = random.random() * self.world_size
+	    		self.y = random.random() * self.world_size
 		self.orientation = random.random() * 2.0 * math.pi
-	    	self.landmarks = [[0, 10], [50, 30], [69, 42], [120, 80], [30, 20]]
+	    	self.landmarks = self.field.getLandmarks()
 		self.forward_noise = 0.0
 		self.turn_noise = 0.0
 		self.sense_noise = 0.0
@@ -41,15 +48,40 @@ class Robot(object):
 	def getPos(self):
 		#TODO: Return the position of the robot
 		return [self.x, self.y]
+	 
+     	def lineLine(self, x1, y1, x2, y2, x3, y3, x4, y4):
+		uA = ((x4-x3)*(y1-y3) - (y4-y3)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1))
+		uB = ((x2-x1)*(y1-y3) - (y2-y1)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1))
+
+		if uA >= 0 and uA <= 1 and uB >= 0 and uB <= 1:
+			return True
+		return False
+
+	def isColliding(self, x1, y1, x2, y2, rx1, ry1, rx2, ry2):
+		left = self.lineLine(x1, y1, x2, y2, rx1, ry2, rx1, ry1)
+		right = self.lineLine(x1, y1, x2, y2, rx2, ry2, rx2, ry1)
+		top = self.lineLine(x1, y1, x2, y2 , rx2, ry2, rx1, ry2)
+		bottom = self.lineLine(x1, y1, x2, y2, rx2, ry1, rx1, ry1)
 	
+		if left or right or top or bottom:
+			return True
+		return False
+
+	def canSense(self, landmark):
+		bl = self.deadzones[2]
+		tr = self.deadzones[1]
+		return not self.isColliding(landmark[0], landmark[1], self.x, self.y, tr[0], tr[1], bl[0], bl[1])
+
 	def sense(self):
-		#TODO: returns all distances of landmarks in a double array
-        	distances = []
-        	for landmark in self.landmarks:
-            		dist = math.sqrt((self.x - landmark[0]) ** 2 + (self.y - landmark[1]) ** 2)
-			dist += random.gauss(0.0, self.sense_noise)
-            		distances.append(dist)
-		return distances
+		dists = []
+		for landmark in self.landmarks:
+			if self.canSense(landmark): 
+				dist = math.sqrt((self.x - landmark[0]) ** 2 + (self.y - landmark[1]) ** 2)
+				dist += random.gauss(0.0, self.sense_noise)
+				dists.append(dist)
+			else:
+				dists.append(-1)
+		return dists
 
 	def Gaussian(self, mu, sigma, x):
 		return math.exp(-((mu-x) ** 2) / (sigma ** 2)/2.0) / math.sqrt(2.0 * math.pi * (sigma ** 2))

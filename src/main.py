@@ -1,7 +1,7 @@
 from robot import Robot
 import random
 
-robot = Robot(10, 50)
+robot = Robot(0, 20)
 print robot.getPos()
 
 robot.set_noise(2.0, 0.1, 2.0)
@@ -10,7 +10,7 @@ T = 100
 N = 1000
 p = []
 for i in range(N):
-	x = Robot()
+	x = Robot(True)
 	x.set_noise(0.05, 0.05, 5.0)
 	p.append(x)
 
