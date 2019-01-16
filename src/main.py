@@ -4,7 +4,7 @@ import random
 robot = Robot(0, 20)
 print robot.getPos()
 
-robot.set_noise(2.0, 0.1, 2.0)
+robot.set_noise(1.0, 0.1, 1.0)
 
 T = 100
 N = 1000
@@ -40,18 +40,27 @@ for t in range(T):
 		p3.append(p[index])
 	p = p3
 
-	avg_x = 0
-	avg_y = 0	
+	num_p = len(p)
+	best_p = Robot()
+	highest_weight = -1.0
 
-	for i in range(N):
-		particle = p[i].getPos()
-		px = particle[0]
-		py = particle[1]
-		avg_x += px
-		avg_y += py
+	for i in range(num_p):
+		p_weight = p[i].measurement_prob(dists)
+		if p_weight > highest_weight:
+			highest_weight = p_weight
+			best_p = p[i] 
+#	avg_x = 0
+#	avg_y = 0	
 
-	avg_p = [avg_x/N , avg_y/N]
+#	for i in range(N):
+#		particle = p[i].getPos()
+#		px = particle[0]
+#		py = particle[1]
+#		avg_x += px
+#		avg_y += py
 
-	print "Actual Pos:[X: %f Y: %f] Particle Pos:[X: %f Y: %f]" % (robot.x, robot.y, avg_p[0], avg_p[1]) 
+#	avg_p = [avg_x/N , avg_y/N]
+
+	print "Actual Pos:[X: %f Y: %f] Particle Pos:[X: %f Y: %f]" % (robot.x, robot.y, best_p.getPos()[0], best_p.getPos()[1]) 
 	#print robot.eval(robot,p)
 #print p

@@ -89,6 +89,8 @@ class Robot(object):
 	def measurement_prob(self, measurement):
 		prob = 1.0;
 		for i in range(len(self.landmarks)):
+			if measurement[i] == -1:
+				continue
 			landmark = self.landmarks[i]
 			dist = math.sqrt((self.x - landmark[0])**2 + (self.y - landmark[1]) ** 2)
 			prob *= self.Gaussian(dist, self.sense_noise, measurement[i])
