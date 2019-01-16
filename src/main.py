@@ -49,18 +49,7 @@ for t in range(T):
 		if p_weight > highest_weight:
 			highest_weight = p_weight
 			best_p = p[i] 
-#	avg_x = 0
-#	avg_y = 0	
-
-#	for i in range(N):
-#		particle = p[i].getPos()
-#		px = particle[0]
-#		py = particle[1]
-#		avg_x += px
-#		avg_y += py
-
-#	avg_p = [avg_x/N , avg_y/N]
-
+	
 	print "Actual Pos:[X: %f Y: %f] Particle Pos:[X: %f Y: %f]" % (robot.x, robot.y, best_p.getPos()[0], best_p.getPos()[1]) 
 	#print robot.eval(robot,p)
 #print p
